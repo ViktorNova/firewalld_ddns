@@ -7,7 +7,7 @@ ZONEFILE="/etc/firewalld/zones/public.xml"
 ZONEFILE_TEMPLATE="/etc/firewalld/zones/public.xml.TEMPLATE"
 
 # Using positional vars $1 domain name $2 zone
-dyn_name="$1"
+DYN_NAME="$1"
 # defaults to trusted zone
 if [[ $2 = "" ]];
  then
@@ -16,15 +16,15 @@ if [[ $2 = "" ]];
   zone="$2"
 fi
 
-# newip - use first record returned by dig if multiple
-newip=$(/usr/bin/dig $dyn_name +short | head -1)
+# NEWIP - use first record returned by dig if multiple
+NEWIP=$(/usr/bin/dig $DYN_NAME +short | head -1)
 
 
 # Check response from dig - must not be empty (not resolved / no connection) 
 function fn_dig_check ()
-if [[ $newip == "" ]];
+if [[ $NEWIP == "" ]];
  then
-  logger update_trusted_source.sh:error:domain not resolved domain=$dyn_name zone=$zone
+  logger update_trusted_source.sh:error:domain not resolved domain=$DYN_NAME zone=$zone
   exit 2
 fi
 
@@ -32,13 +32,13 @@ fi
 # Check if old ip is different than new ip
 function fn_update ()
 {
-oldip=$(/bin/cat ./ip_of_$dyn_name 2>/dev/null)
-if [[ $newip = $oldip ]];
+OLDIP=$(/bin/cat ./ip_of_$dyn_name 2>/dev/null)
+if [[ $NEWIP = $OLDIP ]];
  then
   echo "IP has not changed - exiting"
   exit 2
  else
-  echo "New IP address found for $1 - $newip"
+  echo "New IP address found for $1 - $NEWIP"
   fn_update_action
 fi
 }
@@ -49,11 +49,11 @@ function fn_update_action ()
   echo "Copying $ZONEFILE_TEMPLATE over $ZONEFILE"
   cp $ZONEFILE_TEMPLATE $ZONEFILE
   echo "Updating IP in firewall rule $ZONEFILE"
-  sed -i 's/DDNS_IPADDRESS/'DDNS_IPADDRESS'/g' $ZONEFILE
+  sed -i 's/DDNS_IPADDRESS/'$NEWIP'/g' $ZONEFILE
   cat $ZONEFILE
-  echo $newip > ./ip_of_$dyn_name
+  echo $NEWIP > ./ip_of_$DYN_NAME
   systemctl restart firewalld
-  logger update_trusted_source.sh:info:rule changed ip added domain=$dyn_name zone=$zone newip=$newip
+  logger update_trusted_source.sh:info:rule changed ip added domain=$DYN_NAME zone=$zone NEWIP=$NEWIP
   
 }
 

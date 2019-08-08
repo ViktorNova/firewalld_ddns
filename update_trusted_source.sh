@@ -24,7 +24,7 @@ fi
 # Check if old ip is different than new ip
 function fn_update ()
 {
-OLDIP=$(/bin/cat ./ip_of_$dyn_name 2>/dev/null)
+OLDIP=$(/bin/cat ./ip_of_$DYN_NAME 2>/dev/null)
 if [ "$NEWIP" == "$OLDIP" ];
  then
   echo "IP has not changed - exiting"

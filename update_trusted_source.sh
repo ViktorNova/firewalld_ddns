@@ -8,17 +8,9 @@ ZONEFILE_TEMPLATE="/etc/firewalld/zones/public.xml.TEMPLATE"
 
 # Using positional vars $1 domain name $2 zone
 DYN_NAME="$1"
-# defaults to trusted zone
-if [[ $2 = "" ]];
- then
-  zone="public"
- else
-  zone="$2"
-fi
 
 # NEWIP - use first record returned by dig if multiple
 NEWIP=$(/usr/bin/dig $DYN_NAME +short | head -1)
-
 
 # Check response from dig - must not be empty (not resolved / no connection) 
 function fn_dig_check ()
@@ -33,7 +25,7 @@ fi
 function fn_update ()
 {
 OLDIP=$(/bin/cat ./ip_of_$dyn_name 2>/dev/null)
-if [[ $NEWIP = $OLDIP ]];
+if [[ $NEWIP == $OLDIP ]];
  then
   echo "IP has not changed - exiting"
   exit 2

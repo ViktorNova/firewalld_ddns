@@ -38,6 +38,7 @@ if [[ $newip = $oldip ]];
   echo "IP has not changed - exiting"
   exit 2
  else
+  echo "New IP address found for $1 - $newip"
   fn_update_action
 fi
 }
@@ -45,8 +46,11 @@ fi
 # Copy a firewalld template over the active one and swap out the IP address.
 function fn_update_action ()
 {
-  cp $ZONEFILE $ZONEFILE_TEMPLATE
+  echo "Copying $ZONEFILE_TEMPLATE over $ZONEFILE"
+  cp $ZONEFILE_TEMPLATE $ZONEFILE
+  echo "Updating IP in firewall rule $ZONEFILE"
   sed -i 's/DDNS_IPADDRESS/'DDNS_IPADDRESS'/g' $ZONEFILE
+  cat $ZONEFILE
   echo $newip > ./ip_of_$dyn_name
   systemctl restart firewalld
   logger update_trusted_source.sh:info:rule changed ip added domain=$dyn_name zone=$zone newip=$newip

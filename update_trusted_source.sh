@@ -33,7 +33,7 @@ fi
 function fn_update ()
 {
 oldip=$(/bin/cat ./ip_of_$dyn_name 2>/dev/null)
-if [[ $newip =~ $oldip ]];
+if [[ $newip = $oldip ]];
  then
   echo "IP has not changed - exiting"
   exit 2
@@ -46,7 +46,7 @@ fi
 function fn_update_action ()
 {
   cp $ZONEFILE $ZONEFILE_TEMPLATE
-  sed -i 's/DDNS_IPADDRESS/'DDNS_IPADDRESS'/g' /etc/$ZONEFILE
+  sed -i 's/DDNS_IPADDRESS/'DDNS_IPADDRESS'/g' $ZONEFILE
   echo $newip > ./ip_of_$dyn_name
   systemctl restart firewalld
   logger update_trusted_source.sh:info:rule changed ip added domain=$dyn_name zone=$zone newip=$newip

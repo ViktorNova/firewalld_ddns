@@ -27,8 +27,7 @@ function fn_update ()
 OLDIP=$(/bin/cat ./ip_of_$DYN_NAME 2>/dev/null)
 if [ "$NEWIP" == "$OLDIP" ];
  then
-  echo "IP has not changed - exiting"
-  exit 2
+  exit 1
  else
   echo "New IP address found for $DYN_NAME - $NEWIP"
   fn_update_action
